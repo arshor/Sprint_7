@@ -10,11 +10,7 @@ public class CourierClient extends RestClient {
 
     public ValidatableResponse create(Courier courier) {
         return given()
-                //.spec(getBaseSpec())
-                .header("Content-type", "application/json")
-                .and()
-                .baseUri("http://qa-scooter.praktikum-services.ru")
-                .and()
+                .spec(getBaseSpec())
                 .body(courier)
                 .when()
                 .post(COURIER_PATH)
@@ -23,11 +19,7 @@ public class CourierClient extends RestClient {
 
     public ValidatableResponse login(CourierCredentials credentials) {
         return given()
-                //.spec(getBaseSpec())
-                .header("Content-type", "application/json")
-                .and()
-                .baseUri("http://qa-scooter.praktikum-services.ru")
-                .and()
+                .spec(getBaseSpec())
                 .body(credentials)
                 .when()
                 .post(LOGIN_PATH)
@@ -35,9 +27,8 @@ public class CourierClient extends RestClient {
     }
 
     public ValidatableResponse delete(int id) {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
         return given()
-                //.spec(getBaseSpec())
+                .spec(getBaseSpec())
                 .when()
                 .delete(COURIER_PATH + id)
                 .then();

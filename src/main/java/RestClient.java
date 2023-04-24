@@ -1,10 +1,15 @@
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 
 public class RestClient {
 
-    public RequestSpecBuilder getBaseSpec() {
+    private static final String BASE_URL = "http://qa-scooter.praktikum-services.ru";
+
+    public RequestSpecification getBaseSpec() {
         return new RequestSpecBuilder()
-                .addParam("baseURI", "http://qa-scooter.praktikum-services.ru")
-                .addParam("Content-Type", "application/json");
+                .setBaseUri(BASE_URL)
+                .setContentType(ContentType.JSON)
+                .build();
     }
 }
