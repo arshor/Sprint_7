@@ -1,3 +1,4 @@
+import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
@@ -29,19 +30,21 @@ public class LoginCourierTests {
     }
 
     @Test
-    @DisplayName("Логин курьера в системе успешен")
+    @DisplayName("Логин курьера в системе успешен.")
+    @Description("Логинимся в системе с действующими данными. Поверяется статус ответа, поле \"ok: true\".")
     public void loginCourierIsOk() {
 
         ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
         int statusCode = loginResponse.extract().statusCode();
         courierId = loginResponse.extract().path("id");
 
-        assertEquals(200, statusCode);
-        assertTrue(courierId != 0);
+        assertEquals("Статус ответа не соответствует требуемому.", 200, statusCode);
+        assertTrue("Id курьера не должен быть равен 0.", courierId != 0);
     }
 
     @Test
-    @DisplayName("Логин курьера в системе без логина")
+    @DisplayName("Логин курьера в системе без логина.")
+    @Description("Логинимся в системе с пустым полем логин. Поверяется статус ответа, поле \"message\".")
     public void loginCourierErrorWithEmptyLogin() {
 
         courier.setLogin("");
@@ -50,12 +53,13 @@ public class LoginCourierTests {
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithEmptyLogin = loginResponse.extract().path("message");
 
-        assertEquals(400, statusCode);
-        assertEquals("Недостаточно данных для входа", messageLoginCourierErrorWithEmptyLogin);
+        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCode);
+        assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для входа", messageLoginCourierErrorWithEmptyLogin);
     }
 
     @Test
-    @DisplayName("Логин курьера в системе без пароля")
+    @DisplayName("Логин курьера в системе без пароля.")
+    @Description("Логинимся в системе с пустым полем пароля. Поверяется статус ответа, поле \"message\".")
     public void loginCourierErrorWithEmptyPassword() {
 
         courier.setPassword("");
@@ -64,12 +68,13 @@ public class LoginCourierTests {
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithEmptyPassword = loginResponse.extract().path("message");
 
-        assertEquals(400, statusCode);
-        assertEquals("Недостаточно данных для входа", messageLoginCourierErrorWithEmptyPassword);
+        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCode);
+        assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для входа", messageLoginCourierErrorWithEmptyPassword);
     }
 
     @Test
-    @DisplayName("Логин курьера в системе с неверным логином")
+    @DisplayName("Логин курьера в системе с неверным логином.")
+    @Description("Логинимся в системе с неверным логином и действующим паролем. Поверяется статус ответа, поле \"message\".")
     public void loginCourierErrorWithWrongLogin() {
 
         courier.setLogin(courier.getLogin() + "_");
@@ -78,12 +83,13 @@ public class LoginCourierTests {
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithWrongLogin = loginResponse.extract().path("message");
 
-        assertEquals(404, statusCode);
-        assertEquals("Учетная запись не найдена", messageLoginCourierErrorWithWrongLogin);
+        assertEquals("Статус ответа не соответствует требуемому.", 404, statusCode);
+        assertEquals("Поле ответа \"message\" имеет неверное значение.", "Учетная запись не найдена", messageLoginCourierErrorWithWrongLogin);
     }
 
     @Test
-    @DisplayName("Логин курьера в системе с неверным паролем")
+    @DisplayName("Логин курьера в системе с неверным паролем.")
+    @Description("Логинимся в системе с действующим логином и неверным паролем. Поверяется статус ответа, поле \"message\".")
     public void loginCourierErrorWithWrongPassword() {
 
         courier.setPassword(courier.getPassword() + "_");
@@ -92,8 +98,8 @@ public class LoginCourierTests {
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithWrongPassword = loginResponse.extract().path("message");
 
-        assertEquals(404, statusCode);
-        assertEquals("Учетная запись не найдена", messageLoginCourierErrorWithWrongPassword);
+        assertEquals("Статус ответа не соответствует требуемому.", 404, statusCode);
+        assertEquals("Поле ответа \"message\" имеет неверное значение.", "Учетная запись не найдена", messageLoginCourierErrorWithWrongPassword);
     }
 
 }
