@@ -1,42 +1,54 @@
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 public class CreateCourierTests {
 
     private int courierId;
+    private CourierClient courierClient;
     private Courier courier;
 
     @Before
     public void setUp() {
         RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
-        courier = new Courier("Andrey7286", "asdFGH_86", "Andrey");
+        courierClient = new CourierClient();
+
+        courier = CourierGenerator.getRandom();
+    }
+
+    @After
+    public void cleanUp() {
+        if (courierId != 0) {
+            courierClient.delete(courierId);
+        }
     }
 
     @Test
     @DisplayName("Создание нового курьера")
     public void createNewCourier() {
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier");
 
-        response
-                .then()
-                .assertThat()
-                .statusCode(201)
-                .and()
-                .assertThat()
-                .body("ok", equalTo(true));
+        ValidatableResponse createResponse = courierClient.create(courier);
+
+        int statusCode =createResponse.extract().statusCode();
+        boolean isCourierCreated = createResponse.extract().path("ok");
+
+        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        courierId = loginResponse.extract().path("id");
+
+        assertEquals(201, statusCode);
+        assertTrue(isCourierCreated);
+        assertTrue(courierId != 0);
     }
 
     @Test
@@ -131,33 +143,4 @@ public class CreateCourierTests {
                 .body("ok", equalTo(true));
     }
 
-    @After
-    public void deleteCreatedCourier() {
-
-        String json = "{\"login\": \"" + courier.getLogin() + "\", \"password\": \"" + courier.getPassword() + "\"}";
-
-        Response response1 = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(json)
-                .when()
-                .post("/api/v1/courier/login");
-        try {
-            courierId = response1
-                    .then()
-                    .assertThat()
-                    .statusCode(200)
-                    .extract()
-                    .path("id");
-        } catch (AssertionError assertionError) {
-            //System.out.println("Удалять нечего. Такой id отсутствует.");
-        }
-
-        if (courierId != 0) {
-            given()
-                    .when()
-                    .delete("/api/v1/courier/" + courierId);
-        }
-
-    }
 }
