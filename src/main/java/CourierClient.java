@@ -28,12 +28,21 @@ public class CourierClient extends RestClient {
                 .then();
     }
 
-    @Step("Удаление курьера")
+    @Step("Удаление курьера с id")
     public ValidatableResponse delete(int id) {
         return given()
                 .spec(getBaseSpec())
                 .when()
                 .delete(COURIER_PATH + id)
+                .then();
+    }
+
+    @Step("Удаление курьера без id")
+    public ValidatableResponse deleteWithoutId() {
+        return given()
+                .spec(getBaseSpec())
+                .when()
+                .delete(COURIER_PATH)
                 .then();
     }
 }

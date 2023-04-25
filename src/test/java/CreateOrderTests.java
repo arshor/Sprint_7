@@ -49,7 +49,7 @@ public class CreateOrderTests {
 
     @Test
     @DisplayName("Создание заказа с различным выбором цветов.")
-    @Description("Создание заказа с различным выбором цветов. Прлучение заказа в списке по номеру трека. " +
+    @Description("Создание заказа с различным выбором цветов. Получение заказа в списке по номеру трека. " +
             "Проверка статуса ответа при создании заказа, проверка номера трека и проверка статуса ответа, " +
             "при получении заказа по его номеру")
     public void createOrderWithInDifferentColors() {
@@ -60,7 +60,7 @@ public class CreateOrderTests {
         int statusCode = createResponse.extract().statusCode();
         orderTrack = createResponse.extract().path("track");
 
-        ValidatableResponse orderResponse = orderClient.getOrder(orderTrack);
+        ValidatableResponse orderResponse = orderClient.getOrder(String.valueOf(orderTrack));
         int statusCodeGetOrder = orderResponse.extract().statusCode();
 
         assertEquals("Статус ответа при создании заказа, не соответствует требуемому.", 201, statusCode);

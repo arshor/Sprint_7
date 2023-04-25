@@ -8,6 +8,7 @@ public class OrderClient extends RestClient {
     private static final String ORDER_PATH = "api/v1/orders/";
     private static final String GET_ORDER_PATH = "api/v1/orders/track";
     private static final String CANCEL_ORDER_PATH = "/api/v1/orders/cancel";
+    private static final String ACCEPT_ORDER_PATH = "/api/v1/orders/accept/";
 
     @Step("Создание нового заказа.")
     public ValidatableResponse create(Order order) {
@@ -20,7 +21,7 @@ public class OrderClient extends RestClient {
     }
 
     @Step("Получить заказ по его номеру.")
-    public ValidatableResponse getOrder(int orderTrack) {
+    public ValidatableResponse getOrder(String orderTrack) {
         return given()
                 .spec(getBaseSpec())
                 .queryParam("t", orderTrack)
@@ -47,7 +48,18 @@ public class OrderClient extends RestClient {
                 .spec(getBaseSpec())
                 .body(json)
                 .when()
-                .post(CANCEL_ORDER_PATH)
+                .put(CANCEL_ORDER_PATH)
+                .then();
+    }
+
+    @Step("Принять заказ.")
+    public ValidatableResponse acceptOrder(String orderTrack, String courierId) {
+
+        return given()
+                .spec(getBaseSpec())
+                .queryParam("courierId", courierId)
+                .when()
+                .put(ACCEPT_ORDER_PATH + orderTrack)
                 .then();
     }
 
