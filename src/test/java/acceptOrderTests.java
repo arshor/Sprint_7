@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class acceptOrderTests {
 
     private int orderTrack = 0;
+    private int orderId = 0;
     private OrderClient orderClient;
     private Order order;
     private int courierId = 0;
@@ -27,6 +28,8 @@ public class acceptOrderTests {
         order.setColor(List.of());
         ValidatableResponse createResponse = orderClient.create(order);
         orderTrack = createResponse.extract().path("track");
+        ValidatableResponse createResponse2 = orderClient.getOrder(String.valueOf(orderTrack));
+        orderId = createResponse2.extract().path("order.id");
 
         courierClient = new CourierClient();
         courier = CourierGenerator.getRandom();
@@ -52,7 +55,7 @@ public class acceptOrderTests {
     @Description("Принять заказ по номеру заказа и номеру курьера. Проверка статуса ответа и поля \"ok: true\" .")
     public void acceptOrderByTrackAndCourierId() {
 
-        ValidatableResponse orderResponse = orderClient.acceptOrder(String.valueOf(orderTrack), String.valueOf(courierId));
+        ValidatableResponse orderResponse = orderClient.acceptOrder(String.valueOf(orderId), String.valueOf(courierId));
 
         orderResponse.assertThat()
                 .statusCode(200)
