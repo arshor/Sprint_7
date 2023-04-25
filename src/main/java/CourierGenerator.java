@@ -9,7 +9,7 @@ public class CourierGenerator {
         return new Courier(login, password, firstName);
     }
 
-    public static Courier getStatic() {
+    public static Courier getConst() {
         return new Courier("Andrey7286", "asdFGH_86", "Andrey");
     }
 }
