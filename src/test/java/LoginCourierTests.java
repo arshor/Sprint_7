@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -19,13 +20,13 @@ public class LoginCourierTests {
 
         courierClient = new CourierClient();
         courier = CourierGenerator.getRandom();
-        ValidatableResponse createResponse = courierClient.create(courier);
+        ValidatableResponse createResponse = courierClient.createCourier(courier);
     }
 
     @After
     public void cleanUp() {
         if (courierId != 0) {
-            courierClient.delete(courierId);
+            courierClient.deleteCourier(courierId);
         }
     }
 
@@ -34,11 +35,11 @@ public class LoginCourierTests {
     @Description("Логинимся в системе с действующими данными. Поверяется статус ответа, поле \"ok: true\".")
     public void loginCourierIsOk() {
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         int statusCode = loginResponse.extract().statusCode();
         courierId = loginResponse.extract().path("id");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 200, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_OK, statusCode);
         assertTrue("Id курьера не должен быть равен 0.", courierId != 0);
     }
 
@@ -49,11 +50,11 @@ public class LoginCourierTests {
 
         courier.setLogin("");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithEmptyLogin = loginResponse.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", 	SC_BAD_REQUEST, statusCode);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для входа", messageLoginCourierErrorWithEmptyLogin);
     }
 
@@ -64,11 +65,11 @@ public class LoginCourierTests {
 
         courier.setPassword("");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithEmptyPassword = loginResponse.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", 	SC_BAD_REQUEST, statusCode);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для входа", messageLoginCourierErrorWithEmptyPassword);
     }
 
@@ -79,11 +80,11 @@ public class LoginCourierTests {
 
         courier.setLogin(courier.getLogin() + "_");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithWrongLogin = loginResponse.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 404, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", 	SC_NOT_FOUND, statusCode);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Учетная запись не найдена", messageLoginCourierErrorWithWrongLogin);
     }
 
@@ -94,11 +95,11 @@ public class LoginCourierTests {
 
         courier.setPassword(courier.getPassword() + "_");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         int statusCode = loginResponse.extract().statusCode();
         String messageLoginCourierErrorWithWrongPassword = loginResponse.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 404, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", 	SC_NOT_FOUND, statusCode);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Учетная запись не найдена", messageLoginCourierErrorWithWrongPassword);
     }
 

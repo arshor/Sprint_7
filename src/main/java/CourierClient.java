@@ -9,7 +9,7 @@ public class CourierClient extends RestClient {
     private static final String LOGIN_PATH = "api/v1/courier/login/";
 
     @Step("Регистрация нового курьера")
-    public ValidatableResponse create(Courier courier) {
+    public ValidatableResponse createCourier(Courier courier) {
         return given()
                 .spec(getBaseSpec())
                 .body(courier)
@@ -19,7 +19,7 @@ public class CourierClient extends RestClient {
     }
 
     @Step("Авторизация курьера")
-    public ValidatableResponse login(CourierCredentials credentials) {
+    public ValidatableResponse loginCourier(CourierCredentials credentials) {
         return given()
                 .spec(getBaseSpec())
                 .body(credentials)
@@ -29,7 +29,7 @@ public class CourierClient extends RestClient {
     }
 
     @Step("Удаление курьера с id")
-    public ValidatableResponse delete(int id) {
+    public ValidatableResponse deleteCourier(int id) {
         return given()
                 .spec(getBaseSpec())
                 .when()
@@ -38,7 +38,7 @@ public class CourierClient extends RestClient {
     }
 
     @Step("Удаление курьера без id")
-    public ValidatableResponse deleteWithoutId() {
+    public ValidatableResponse deleteCourierWithoutId() {
         return given()
                 .spec(getBaseSpec())
                 .when()

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -19,8 +20,8 @@ public class DeleteCourierTests {
 
         courierClient = new CourierClient();
         courier = CourierGenerator.getRandom();
-        courierClient.create(courier);
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        courierClient.createCourier(courier);
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         courierId = loginResponse.extract().path("id");
     }
 
@@ -29,12 +30,12 @@ public class DeleteCourierTests {
     @Description("Удалается, созданный в setUp курьер. Проверяется статус ответа и поле \"ok: true\".")
     public void deleteCourier() {
 
-        ValidatableResponse deleteResponse = courierClient.delete(courierId);
+        ValidatableResponse deleteResponse = courierClient.deleteCourier(courierId);
         int statusCode = deleteResponse.extract().statusCode();
-        //boolean isCourierDeleted = deleteResponse.extract().path("ok");
+        boolean isCourierDeleted = deleteResponse.extract().path("ok");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 200, statusCode);
-        //ssertTrue("Поле ответа \"ok\" имеет неверное значение.", isCourierDeleted);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_OK, statusCode);
+        assertTrue("Поле ответа \"ok\" имеет неверное значение.", isCourierDeleted);
     }
 
     @Test
@@ -43,11 +44,11 @@ public class DeleteCourierTests {
     public void deleteCourierWithWrongId() {
 
         courierId = RandomUtils.nextInt();
-        ValidatableResponse deleteResponse = courierClient.delete(courierId);
+        ValidatableResponse deleteResponse = courierClient.deleteCourier(courierId);
         int statusCode = deleteResponse.extract().statusCode();
         String messageDeleteCourierWithWrongId = deleteResponse.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 404, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", 	SC_NOT_FOUND, statusCode);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Курьера с таким id нет.", messageDeleteCourierWithWrongId);
     }
 
@@ -56,11 +57,11 @@ public class DeleteCourierTests {
     @Description("Удалается курьер, без указания id. Проверяется статус ответа и сообщение об ошибке.")
     public void deleteCourierWithoutId() {
 
-        ValidatableResponse deleteResponse = courierClient.deleteWithoutId();
+        ValidatableResponse deleteResponse = courierClient.deleteCourierWithoutId();
         int statusCode = deleteResponse.extract().statusCode();
         String messageDeleteCourierWithoutId = deleteResponse.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_BAD_REQUEST, statusCode);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для удаления курьера.", messageDeleteCourierWithoutId);
     }
 

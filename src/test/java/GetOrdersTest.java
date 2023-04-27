@@ -4,7 +4,8 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.junit.Assert.*;
 
 public class GetOrdersTest {
 
@@ -22,9 +23,14 @@ public class GetOrdersTest {
 
         ValidatableResponse createResponse = orderClient.getListOrders();
 
-        createResponse.assertThat()
-                .statusCode(200)
-                .body("orders", notNullValue());
+        int statusCodeGetOrderByTrack = createResponse.extract().statusCode();
+
+        assertEquals("Статус ответа не соответствует требуемому.", SC_OK, statusCodeGetOrderByTrack);
+        assertNotNull("Поле ответа order.track должно совпадать с треком заказа.", createResponse.extract().path("orders"));
+
+//        createResponse.assertThat()
+//                .statusCode(SC_OK)
+//                .body("orders", notNullValue());
         }
 
 }

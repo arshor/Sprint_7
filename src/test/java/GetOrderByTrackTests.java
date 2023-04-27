@@ -6,10 +6,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.*;
 
-public class getOrderByTrackTests {
+public class GetOrderByTrackTests {
 
     private int orderTrack;
     private OrderClient orderClient;
@@ -20,7 +22,7 @@ public class getOrderByTrackTests {
         orderClient = new OrderClient();
         order = OrderGenerator.getConst();
 
-        ValidatableResponse createResponse = orderClient.create(order);
+        ValidatableResponse createResponse = orderClient.createOrder(order);
         orderTrack = createResponse.extract().path("track");
     }
 
@@ -39,9 +41,15 @@ public class getOrderByTrackTests {
 
         ValidatableResponse orderResponse = orderClient.getOrder(String.valueOf(orderTrack));
 
-        orderResponse.assertThat()
-                .statusCode(200)
-                .body("order", notNullValue());
+        int statusCodeGetOrderByTrack = orderResponse.extract().statusCode();
+        int actualOrderTrack = orderResponse.extract().path("order.track");
+
+        assertEquals("Статус ответа не соответствует требуемому.", SC_OK, statusCodeGetOrderByTrack);
+        assertEquals("Поле ответа order.track должно совпадать с треком заказа.", actualOrderTrack, orderTrack);
+
+//        orderResponse.assertThat()
+//                .statusCode(SC_OK)
+//                .body("order", notNullValue());
     }
 
     @Test
@@ -54,9 +62,15 @@ public class getOrderByTrackTests {
 
         ValidatableResponse orderResponse = orderClient.getOrder(String.valueOf(orderTrack));
 
-        orderResponse.assertThat()
-                .statusCode(404)
-                .body("message", equalTo("Заказ не найден"));
+        int statusCodeGetOrderByWrongTrack = orderResponse.extract().statusCode();
+        String messageGetOrderByWrongTrack = orderResponse.extract().path("message");
+
+        assertEquals("Статус ответа не соответствует требуемому.", SC_NOT_FOUND, statusCodeGetOrderByWrongTrack);
+        assertEquals("Поле ответа \"message\" имеет неверное значение.", "Заказ не найден", messageGetOrderByWrongTrack);
+
+//        orderResponse.assertThat()
+//                .statusCode(SC_NOT_FOUND)
+//                .body("message", equalTo("Заказ не найден"));
     }
 
     @Test
@@ -67,9 +81,15 @@ public class getOrderByTrackTests {
 
         ValidatableResponse orderResponse = orderClient.getOrder(null);
 
-        orderResponse.assertThat()
-                .statusCode(400)
-                .body("message", equalTo("Недостаточно данных для поиска"));
+        int statusCodeGetOrderWithoutTrack = orderResponse.extract().statusCode();
+        String messageGetOrderWithoutTrack = orderResponse.extract().path("message");
+
+        assertEquals("Статус ответа не соответствует требуемому.", SC_BAD_REQUEST, statusCodeGetOrderWithoutTrack);
+        assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для поиска", messageGetOrderWithoutTrack);
+
+//        orderResponse.assertThat()
+//                .statusCode(	SC_BAD_REQUEST)
+//                .body("message", equalTo("Недостаточно данных для поиска"));
     }
 
 }

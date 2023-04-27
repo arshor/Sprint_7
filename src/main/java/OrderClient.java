@@ -11,7 +11,7 @@ public class OrderClient extends RestClient {
     private static final String ACCEPT_ORDER_PATH = "/api/v1/orders/accept/";
 
     @Step("Создание нового заказа.")
-    public ValidatableResponse create(Order order) {
+    public ValidatableResponse createOrder(Order order) {
         return given()
                 .spec(getBaseSpec())
                 .body(order)

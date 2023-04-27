@@ -6,6 +6,7 @@ import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 
 
+import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.*;
 
 public class CreateCourierTests {
@@ -24,7 +25,7 @@ public class CreateCourierTests {
     @After
     public void cleanUp() {
         if (courierId != 0) {
-            courierClient.delete(courierId);
+            courierClient.deleteCourier(courierId);
         }
     }
 
@@ -34,15 +35,15 @@ public class CreateCourierTests {
             "Проверяется статус ответа, поле \"ok: true\" и успешность попытки войти, через проверку полученного id.")
     public void createNewCourier() {
 
-        ValidatableResponse createResponse = courierClient.create(courier);
+        ValidatableResponse createResponse = courierClient.createCourier(courier);
 
         int statusCode = createResponse.extract().statusCode();
         boolean isCourierCreated = createResponse.extract().path("ok");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         courierId = loginResponse.extract().path("id");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 201, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_CREATED, statusCode);
         assertTrue("Поле ответа \"ok\" имеет неверное значение.", isCourierCreated);
         assertTrue("Id курьера не должен быть равен 0.", courierId != 0);
     }
@@ -55,24 +56,24 @@ public class CreateCourierTests {
             " Проверяется статус ответа, при создании курьера с такими же данными и поле \"message\".")
     public void createNewCourierWithTheSameName() {
 
-        ValidatableResponse createResponse = courierClient.create(courier);
+        ValidatableResponse createResponse = courierClient.createCourier(courier);
 
         int statusCode = createResponse.extract().statusCode();
         boolean isCourierCreated = createResponse.extract().path("ok");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         courierId = loginResponse.extract().path("id");
 
-        ValidatableResponse createResponseCourierWithSameName = courierClient.create(courier);
+        ValidatableResponse createResponseCourierWithSameName = courierClient.createCourier(courier);
 
         int statusCodeCreateNewCourierWithTheSameName = createResponseCourierWithSameName.extract().statusCode();
         String messageCreateNewCourierWithTheSameName = createResponseCourierWithSameName.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 201, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_CREATED, statusCode);
         assertTrue("Поле ответа \"ok\" имеет неверное значение.", isCourierCreated);
         assertTrue("Id курьера не должен быть равен 0.", courierId != 0);
 
-        assertEquals("Статус ответа не соответствует требуемому.", 409, statusCodeCreateNewCourierWithTheSameName);
+        assertEquals("Статус ответа не соответствует требуемому.", 	SC_CONFLICT, statusCodeCreateNewCourierWithTheSameName);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Этот логин уже используется. Попробуйте другой.", messageCreateNewCourierWithTheSameName);
     }
 
@@ -82,12 +83,12 @@ public class CreateCourierTests {
 
         courier.setLogin(null);
 
-        ValidatableResponse createResponseCreateNewCourierWithoutLogin = courierClient.create(courier);
+        ValidatableResponse createResponseCreateNewCourierWithoutLogin = courierClient.createCourier(courier);
 
         int statusCodeCreateNewCourierWithoutLogin = createResponseCreateNewCourierWithoutLogin.extract().statusCode();
         String messageCreateNewCourierWithoutLogin = createResponseCreateNewCourierWithoutLogin.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCodeCreateNewCourierWithoutLogin);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_BAD_REQUEST, statusCodeCreateNewCourierWithoutLogin);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для создания учетной записи", messageCreateNewCourierWithoutLogin);
     }
 
@@ -97,12 +98,12 @@ public class CreateCourierTests {
 
         courier.setPassword(null);
 
-        ValidatableResponse createResponseCreateNewCourierWithoutLogin = courierClient.create(courier);
+        ValidatableResponse createResponseCreateNewCourierWithoutLogin = courierClient.createCourier(courier);
 
         int statusCodeCreateNewCourierWithoutLogin = createResponseCreateNewCourierWithoutLogin.extract().statusCode();
         String messageCreateNewCourierWithoutLogin = createResponseCreateNewCourierWithoutLogin.extract().path("message");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 400, statusCodeCreateNewCourierWithoutLogin);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_BAD_REQUEST, statusCodeCreateNewCourierWithoutLogin);
         assertEquals("Поле ответа \"message\" имеет неверное значение.", "Недостаточно данных для создания учетной записи", messageCreateNewCourierWithoutLogin);
     }
 
@@ -112,15 +113,15 @@ public class CreateCourierTests {
 
         courier.setFirstname(null);
 
-        ValidatableResponse createResponse = courierClient.create(courier);
+        ValidatableResponse createResponse = courierClient.createCourier(courier);
 
         int statusCode = createResponse.extract().statusCode();
         boolean isCourierCreated = createResponse.extract().path("ok");
 
-        ValidatableResponse loginResponse = courierClient.login(CourierCredentials.from(courier));
+        ValidatableResponse loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
         courierId = loginResponse.extract().path("id");
 
-        assertEquals("Статус ответа не соответствует требуемому.", 201, statusCode);
+        assertEquals("Статус ответа не соответствует требуемому.", SC_CREATED, statusCode);
         assertTrue("Поле ответа \"ok\" имеет неверное значение.", isCourierCreated);
         assertTrue("Id курьера не должен быть равен 0.", courierId != 0);
     }

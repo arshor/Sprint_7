@@ -9,6 +9,8 @@ import io.qameta.allure.junit4.DisplayName;
 
 import java.util.List;
 
+import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +57,7 @@ public class CreateOrderTests {
     public void createOrderWithInDifferentColors() {
 
         order.setColor(color);
-        ValidatableResponse createResponse = orderClient.create(order);
+        ValidatableResponse createResponse = orderClient.createOrder(order);
 
         int statusCode = createResponse.extract().statusCode();
         orderTrack = createResponse.extract().path("track");
@@ -63,9 +65,9 @@ public class CreateOrderTests {
         ValidatableResponse orderResponse = orderClient.getOrder(String.valueOf(orderTrack));
         int statusCodeGetOrder = orderResponse.extract().statusCode();
 
-        assertEquals("Статус ответа при создании заказа, не соответствует требуемому.", 201, statusCode);
+        assertEquals("Статус ответа при создании заказа, не соответствует требуемому.", SC_CREATED, statusCode);
         assertTrue("Номер трека заказа не должен быть равен 0.", orderTrack != 0);
-        assertEquals("Статус ответа получения заказа по номеру, не соответствует требуемому.", 200, statusCodeGetOrder);
+        assertEquals("Статус ответа получения заказа по номеру, не соответствует требуемому.", SC_OK, statusCodeGetOrder);
 
     }
 }
